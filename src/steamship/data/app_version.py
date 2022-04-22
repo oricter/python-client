@@ -7,6 +7,7 @@ from steamship.base import Client, Request
 @dataclass
 class CreateAppVersionRequest(Request):
     appId: str = None
+    name: str = None
     handle: str = None
     upsert: bool = None
     type: str = 'file'
@@ -28,6 +29,7 @@ class AppVersion:
     client: Client = None
     id: str = None
     appId: str = None
+    name: str = None
     handle: str = None
     configTemplate: Dict[str, any] = None
 
@@ -39,6 +41,7 @@ class AppVersion:
         return AppVersion(
             client=client,
             id=d.get('id', None),
+            name=d.get('name', None),
             handle=d.get('handle', None),
             configTemplate=d.get('configTemplate', None)
         )
@@ -47,6 +50,7 @@ class AppVersion:
     def create(
             client: Client,
             appId: str = None,
+            name: str = None,
             handle: str = None,
             filename: str = None,
             filebytes: bytes = None,
@@ -65,6 +69,7 @@ class AppVersion:
                 filebytes = f.read()
 
         req = CreateAppVersionRequest(
+            name=name,
             handle=handle,
             appId=appId,
             upsert=upsert,

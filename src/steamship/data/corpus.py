@@ -12,6 +12,7 @@ class Corpus:
     """
     client: Client
     id: str = None
+    name: str = None
     handle: str = None
     description: str = None
     externalId: str = None
@@ -21,6 +22,7 @@ class Corpus:
     @dataclass
     class CreateRequest(Request):
         corpusId: str = None
+        name: str = None
         handle: str = None
         description: str = None
         externalId: str = None
@@ -55,6 +57,7 @@ class Corpus:
         return Corpus(
             client=client,
             id=d.get('id', None),
+            name=d.get('name', None),
             handle=d.get('handle', None),
             description=d.get('description', None),
             externalId=d.get('externalId', None),
@@ -82,6 +85,7 @@ class Corpus:
     @staticmethod
     def create(
             client: Client,
+            name: str = None,
             handle: str = None,
             description: str = None,
             externalId: str = None,
@@ -97,6 +101,7 @@ class Corpus:
             metadata = json.dumps(metadata)
 
         req = Corpus.CreateRequest(
+            name=name,
             handle=handle,
             description=description,
             isPublic=isPublic,

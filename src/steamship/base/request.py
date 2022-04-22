@@ -8,6 +8,7 @@ class Request:
 @dataclass
 class GetRequest(Request):
     id: str = None
+    name: str = None
     handle: str = None
     upsert: bool = None
 

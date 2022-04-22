@@ -22,6 +22,7 @@ class Plugin:
 class CreatePluginRequest(Request):
     isTrainable: bool
     id: str = None
+    name: str = None
     type: str = None
     transport: str = None
     isPublic: bool = None
@@ -97,6 +98,7 @@ class LimitUnit:
 class Plugin:
     client: Client = None
     id: str = None
+    name: str = None
     type: str = None
     transport: str = None
     isPublic: bool = None
@@ -117,6 +119,7 @@ class Plugin:
         return Plugin(
             client=client,
             id=d.get('id', None),
+            name=d.get('name', None),
             type=d.get('type', None),
             transport=d.get('transport', None),
             isPublic=d.get('isPublic', None),
@@ -134,6 +137,7 @@ class Plugin:
     def create(
             client: Client,
             isTrainable: bool,
+            name: str,
             description: str,
             type: str,
             transport: str,
@@ -153,6 +157,7 @@ class Plugin:
 
         req = CreatePluginRequest(
             isTrainable=isTrainable,
+            name=name,
             type=type,
             transport=transport,
             isPublic=isPublic,
@@ -174,15 +179,30 @@ class Plugin:
         )
 
     @staticmethod
-    def list(
+    def listPublic(
             client: Client,
             type: str = None,
             spaceId: str = None,
             spaceHandle: str = None
     ) -> Response[ListPluginsResponse]:
         return client.post(
-            'plugin/list',
+            'plugin/public',
             ListPublicPluginsRequest(type=type),
+            expect=ListPluginsResponse,
+            spaceId=spaceId,
+            spaceHandle=spaceHandle
+        )
+
+    @staticmethod
+    def listPrivate(
+            client: Client,
+            type=None,
+            spaceId: str = None,
+            spaceHandle: str = None
+    ) -> Response[ListPluginsResponse]:
+        return client.post(
+            'plugin/private',
+            ListPrivatePluginsRequest(type=type),
             expect=ListPluginsResponse,
             spaceId=spaceId,
             spaceHandle=spaceHandle
@@ -195,6 +215,14 @@ class Plugin:
             GetPluginRequest(handle=handle),
             expect=Plugin
         )
+
+    @staticmethod
+    def getPublic(client: Client, handle: str):
+        publicPlugins = Plugin.listPublic(client=client).data.plugins
+        for plugin in publicPlugins:
+            if plugin.handle == handle:
+                return plugin
+        return None
 
     def delete(self) -> Response[Plugin]:
         return self.client.post(

@@ -10,8 +10,9 @@ __license__ = "MIT"
 
 def test_plugin_create():
     steamship = _steamship()
+    name = _random_name()
 
-    my_plugins = Plugin.list(steamship).data
+    my_plugins = Plugin.listPrivate(steamship).data
     orig_count = len(my_plugins.plugins)
 
     # Should require name
@@ -28,6 +29,7 @@ def test_plugin_create():
     with pytest.raises(Exception):
         index = Plugin.create(
             client=steamship,
+            name="Test Plugin",
             type=PluginType.embedder,
             transport=PluginAdapterType.steamshipDocker,
             isPublic=True
@@ -37,6 +39,7 @@ def test_plugin_create():
     with pytest.raises(Exception):
         index = Plugin.create(
             client=steamship,
+            name="Test Plugin",
             description="This is just for test",
             transport=PluginAdapterType.steamshipDocker,
             isPublic=True
@@ -46,6 +49,7 @@ def test_plugin_create():
     with pytest.raises(Exception):
         index = steamship.plugins.create(
             client=steamship,
+            name="Test Plugin",
             description="This is just for test",
             type=PluginType.embedder,
             url="http://foo4",
@@ -56,23 +60,25 @@ def test_plugin_create():
     with pytest.raises(Exception):
         index = steamship.plugins.create(
             client=steamship,
+            name="Test Plugin",
             description="This is just for test",
             type=PluginType.embedder,
             transport=PluginAdapterType.steamshipDocker,
         )
 
-    my_plugins = Plugin.list(steamship).data
+    my_plugins = Plugin.listPrivate(steamship).data
     assert (len(my_plugins.plugins) == orig_count)
 
     plugin = Plugin.create(
         client=steamship,
         isTrainable=False,
+        name=_random_name(),
         description="This is just for test",
         type=PluginType.tagger,
         transport=PluginAdapterType.steamshipDocker,
         isPublic=False
     ).data
-    my_plugins = Plugin.list(steamship).data
+    my_plugins = Plugin.listPrivate(steamship).data
     assert (len(my_plugins.plugins) == orig_count + 1)
 
     # No upsert doesn't work
@@ -80,6 +86,7 @@ def test_plugin_create():
         client=steamship,
         isTrainable=False,
         handle=plugin.handle,
+        name=plugin.name,
         description="This is just for test",
         type=PluginType.tagger,
         transport=PluginAdapterType.steamshipDocker,
@@ -92,7 +99,7 @@ def test_plugin_create():
     plugin2 = Plugin.create(
         client=steamship,
         isTrainable=False,
-        handle=plugin.handle,
+        name=plugin.name,
         description="This is just for test 2",
         type=PluginType.tagger,
         transport=PluginAdapterType.steamshipDocker,
@@ -102,7 +109,7 @@ def test_plugin_create():
 
     assert (plugin2.id == plugin.id)
 
-    my_plugins = Plugin.list(steamship).data
+    my_plugins = Plugin.listPrivate(steamship).data
     assert (len(my_plugins.plugins) == orig_count + 1)
 
     assert (plugin2.id in [plugin.id for plugin in my_plugins.plugins])
@@ -112,14 +119,15 @@ def test_plugin_create():
 
     plugin.delete()
 
-    my_plugins = Plugin.list(steamship).data
+    my_plugins = Plugin.listPrivate(steamship).data
     assert (len(my_plugins.plugins) == orig_count)
 
 
 def test_plugin_public():
     steamship = _steamship()
+    name = _random_name()
 
-    resp = Plugin.list(steamship).data
+    resp = Plugin.listPublic(steamship).data
     assert (resp.plugins is not None)
     plugins = resp.plugins
 

@@ -8,11 +8,13 @@ from steamship.base.request import GetRequest, IdentifierRequest
 class Space:
     client: Client = None
     id: str = None
+    name: str = None
     handle: str = None
 
     @dataclass
     class CreateRequest(Request):
         id: str = None
+        name: str = None
         handle: str = None
         upsert: bool = None
         externalId: str = None
@@ -38,6 +40,7 @@ class Space:
         return Space(
             client=client,
             id=d.get('id', None),
+            name=d.get('name', None),
             handle=d.get('handle', None)
         )
 
@@ -45,6 +48,7 @@ class Space:
     def get(
             client: Client,
             id: str = None,
+            name: str = None,
             handle: str = None,
             upsert: bool = None,
             spaceId: str = None,
@@ -53,6 +57,7 @@ class Space:
     ) -> "Response[Space]":
         req = GetRequest(
             id=id,
+            name=name,
             handle=handle,
             upsert=upsert
         )
@@ -61,6 +66,7 @@ class Space:
     @staticmethod
     def create(
             client: Client,
+            name: str,
             handle: str,
             externalId: str = None,
             externalType: str = None,
@@ -68,6 +74,7 @@ class Space:
             upsert: bool = True
     ) -> "Response[Space]":
         req = Space.CreateRequest(
+            name=name,
             handle=handle,
             upsert=upsert,
             externalId=externalId,

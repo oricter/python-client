@@ -11,6 +11,7 @@ from steamship.plugin.outputs.block_and_tag_plugin_output import BlockAndTagPlug
 def upload(
         client: Client,
         filename: str = None,
+        name: str = None,
         content: str = None,
         mimeType: str = None,
         corpusId: str = None,
@@ -18,23 +19,25 @@ def upload(
         spaceHandle: str = None,
         space: any = None
 ) -> "Response[File]":
-    if filename is None and content is None:
-        raise Exception("Either filename or content must be provided.")
+    if filename is None and name is None and content is None:
+        raise Exception("Either filename or name + content must be provided.")
 
     if filename is not None:
         with open(filename, 'rb') as f:
             content = f.read()
+            name = filename
 
     req = File.CreateRequest(
         type=FileUploadType.file,
         corpusId=corpusId,
+        name=name,
         mimeType=mimeType
     )
 
     return client.post(
         'file/create',
         payload=req,
-        file=(content, "multipart/form-data"),
+        file=(name, content, "multipart/form-data"),
         expect=File,
         spaceId=spaceId,
         spaceHandle=spaceHandle,
@@ -45,7 +48,7 @@ def upload(
 File.upload = upload
 
 
-def blockify(self, pluginInstance: str = None):
+def convert(self, pluginInstance: str = None ):
     req = ConvertRequest(
         type='file',
         id=self.id,
@@ -53,7 +56,7 @@ def blockify(self, pluginInstance: str = None):
     )
 
     return self.client.post(
-        'plugin/instance/blockify',
+        'plugin/instance/convert',
         payload=req,
         expect=BlockAndTagPluginOutput,
         asynchronous=True,
@@ -61,7 +64,7 @@ def blockify(self, pluginInstance: str = None):
     )
 
 
-File.blockify = blockify
+File.convert = convert
 
 
 
@@ -121,6 +124,7 @@ File.tag = tag
 def index(
         self,
         pluginInstance: str = None,
+        indexName: str = None,
         indexId: str = None,
         index: "EmbeddingIndex" = None,
         upsert: bool = True,
@@ -134,8 +138,12 @@ def index(
     if indexId is None and index is not None:
         indexId = index.id
 
+    if indexName is None:
+        indexName = "{}-{}".format(self.id, pluginInstance)
+
     if indexId is None and index is None:
         index = self.client.create_index(
+            name=indexName,
             pluginInstance=pluginInstance,
             upsert=True,
             spaceId=spaceId,

@@ -65,6 +65,7 @@ class Steamship(Client):
     def create_index(
             self,
             handle: str = None,
+            name: str = None,
             pluginInstance: str = None,
             upsert: bool = True,
             externalId: str = None,
@@ -77,6 +78,7 @@ class Steamship(Client):
         return EmbeddingIndex.create(
             client=self,
             handle=handle,
+            name=name,
             pluginInstance=pluginInstance,
             upsert=upsert,
             externalId=externalId,
@@ -90,6 +92,7 @@ class Steamship(Client):
     def upload(
             self,
             filename: str = None,
+            name: str = None,
             content: str = None,
             mimeType: str = None,
             plugin: str = None,
@@ -100,6 +103,7 @@ class Steamship(Client):
         return File.create(
             self,
             filename=filename,
+            name=name,
             content=content,
             mimeType=mimeType,
             spaceId=spaceId,
@@ -110,13 +114,17 @@ class Steamship(Client):
     def scrape(
             self,
             url: str,
+            name: str = None,
             spaceId: str = None,
             spaceHandle: str = None,
             space: Space = None,
     ) -> File:
+        if name is None:
+            name = url
         return File.scrape(
             self,
             url,
+            name,
             spaceId=spaceId,
             spaceHandle=spaceHandle,
             space=space

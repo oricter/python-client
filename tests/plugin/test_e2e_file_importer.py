@@ -12,6 +12,7 @@ def test_e2e_importer():
     with deploy_plugin("plugin_file_importer.py","fileImporter") as (plugin, version, instance):
         file = File.create(
             client=client,
+            name="Test.txt",
             content="This is a test.",
             pluginInstance=instance.handle
         ).data

@@ -8,8 +8,9 @@ __license__ = "MIT"
 
 def test_version_create():
     client = _steamship()
+    name = _random_name()
 
-    app = App.create(client).data
+    app = App.create(client, name=name).data
     zip_bytes = create_app_zip('demo_app.py')
 
     version = AppVersion.create(

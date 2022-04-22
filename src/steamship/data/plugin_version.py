@@ -12,6 +12,7 @@ class PluginVersion:
 @dataclass
 class CreatePluginVersionRequest(Request):
     pluginId: str = None
+    name: str = None
     handle: str = None
     upsert: bool = None
     type: str = 'file'
@@ -51,6 +52,7 @@ class PluginVersion:
     client: Client = None
     id: str = None
     pluginId: str = None
+    name: str = None
     handle: str = None
     configTemplate: Dict[str, any] = None
 
@@ -62,6 +64,7 @@ class PluginVersion:
         return PluginVersion(
             client=client,
             id=d.get('id', None),
+            name=d.get('name', None),
             handle=d.get('handle', None),
             configTemplate=d.get('configTemplate', None)
         )
@@ -71,6 +74,7 @@ class PluginVersion:
             client: Client,
             handle: str,
             pluginId: str = None,
+            name: str = None,
             filename: str = None,
             filebytes: bytes = None,
             upsert: bool = None,
@@ -87,6 +91,7 @@ class PluginVersion:
                 filebytes = f.read()
 
         req = CreatePluginVersionRequest(
+            name=name,
             handle=handle,
             pluginId=pluginId,
             upsert=upsert,
