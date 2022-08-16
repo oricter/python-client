@@ -17,8 +17,8 @@ def create_handler(app_cls: Type[App]):  # noqa: C901
     """Wrapper function for a Steamship app within an AWS Lambda function."""
 
     def _handler(
-        event: Dict,
-        _: Dict = None,
+            event: Dict,
+            _: Dict = None,
     ) -> Response:
         try:
             client = Steamship(
@@ -118,7 +118,7 @@ def create_handler(app_cls: Type[App]):  # noqa: C901
         logging.info(f"Invocation context: {invocation_context}")
 
         if (
-            logging_host != "none"
+                logging_host != "none"
         ):  # Key off the string none, not 'is None', to avoid config errors where remote host isn't passed
             # Configure remote logging
             if logging_host is None:
@@ -162,6 +162,6 @@ def create_handler(app_cls: Type[App]):  # noqa: C901
         response = _handler(event, context)
         if logging_handler is not None:
             logging_handler.close()
-        return response.dict(by_alias=True)
+        return response.dict(by_alias=True, exclude_none=True)
 
     return handler
