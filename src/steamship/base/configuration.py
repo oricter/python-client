@@ -58,7 +58,7 @@ class Configuration(CamelModel):
             profile,
             raise_on_exception=config_file is not None,
         )
-        config_dict.update(self._get_config_dict_from_environment())
+        config_dict.update(self._get_config_dict_from_environment(profile))
         kwargs.update({k: v for k, v in config_dict.items() if kwargs.get(k) is None})
 
         kwargs["api_base"] = format_uri(kwargs.get("api_base"))
@@ -90,10 +90,10 @@ class Configuration(CamelModel):
         return {}
 
     @staticmethod
-    def _get_config_dict_from_environment():
+    def _get_config_dict_from_environment(profile: str):
         """Overrides configuration with environment variables."""
         return {
-            property_name: os.getenv(environment_variable_name, None)
+            property_name: os.getenv(f"{environment_variable_name}_{profile.upper()}", None)
             for environment_variable_name, property_name in ENVIRONMENT_VARIABLES_TO_PROPERTY.items()
-            if environment_variable_name in os.environ
+            if f"{environment_variable_name}_{profile.upper()}" in os.environ
         }
